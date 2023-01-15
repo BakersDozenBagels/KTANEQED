@@ -7,15 +7,16 @@ using Random = UnityEngine.Random;
 
 public class QEDScript : MonoBehaviour
 {
-    [SerializeField]
+    [SerializeField, RummageNoRemove, RummageNoRename]
     private QEDCard[] _buttons;
-    [SerializeField]
+    [SerializeField, RummageNoRemove, RummageNoRename]
     private Renderer _backing;
 
     private int _id = ++_idc;
     private static int _idc;
     private bool _isSolved;
 
+    [RummageNoRemove, RummageNoRename]
     private void Start()
     {
         Generate();
