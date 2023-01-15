@@ -332,8 +332,8 @@ public class QEDScript : MonoBehaviour
 
     private void Log(string v)
     {
-#if UNITY_EDITOR
+//#if UNITY_EDITOR
         Debug.Log("[Q.E.D. #" + _id + "] " + v);
-#endif
+//#endif
     }
 }
