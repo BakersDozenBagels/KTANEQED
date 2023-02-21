@@ -18,6 +18,6 @@ MonoBehaviour:
 
 
     ID: QED'
-  version: 1.2
+  version: 1.3
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 723f3840ae060524ebfd2dd4eb364c96, type: 3}

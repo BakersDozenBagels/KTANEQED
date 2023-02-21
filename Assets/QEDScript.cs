@@ -2,21 +2,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
 public class QEDScript : MonoBehaviour
 {
-    [SerializeField, RummageNoRemove, RummageNoRename]
+    [SerializeField]
     private QEDCard[] _buttons;
-    [SerializeField, RummageNoRemove, RummageNoRename]
+    [SerializeField]
     private Renderer _backing;
 
     private int _id = ++_idc;
     private static int _idc;
     private bool _isSolved;
 
-    [RummageNoRemove, RummageNoRename]
     private void Start()
     {
         Generate();
@@ -155,15 +155,16 @@ public class QEDScript : MonoBehaviour
             _buttons[i].SymbolBaseColor = Color.black;
             _buttons[i].SymbolHighlightColor = _hls[i] / 2 == 1 ? Color.white : Color.black;
             _buttons[i].ShownSymbol = _symbols[i];
+            _buttons[i].Part = cards[i].Part;
 
             int j = i;
             _buttons[i].Press += () => Press(j);
         }
 
         Log(string.Format("A possible solution would be: ({0}), ({1}), ({2})",
-            Enumerable.Range(0,16).Where(i => cards[i].Part == 1).Join(", "),
-            Enumerable.Range(0,16).Where(i => cards[i].Part == 2).Join(", "),
-            Enumerable.Range(0,16).Where(i => cards[i].Part == 3).Join(", ")
+            Enumerable.Range(0, 16).Where(i => cards[i].Part == 1).Join(", "),
+            Enumerable.Range(0, 16).Where(i => cards[i].Part == 2).Join(", "),
+            Enumerable.Range(0, 16).Where(i => cards[i].Part == 3).Join(", ")
             ));
 
         //TODO: Generate uniquely?
@@ -333,8 +334,80 @@ public class QEDScript : MonoBehaviour
 
     private void Log(string v)
     {
-//#if UNITY_EDITOR
+        //#if UNITY_EDITOR
         Debug.Log("[Q.E.D. #" + _id + "] " + v);
-//#endif
+        //#endif
+    }
+
+#pragma warning disable 414
+    private const string TwitchHelpMessage = @"!{0} A1 B1 C1...";
+#pragma warning restore 414
+
+    private IEnumerator ProcessTwitchCommand(string command)
+    {
+        command = command.Trim().ToLowerInvariant();
+        Match m = Regex.Match(command, @"[a-d][1-4](?:\s+[a-d][1-4])*");
+
+        if(m.Success)
+        {
+            yield return null;
+            while((m = Regex.Match(command, @"^\s*([a-d])([1-4])\s*")).Success)
+            {
+                int ix = "abcd".IndexOf(m.Groups[1].Value) + 4 * int.Parse(m.Groups[2].Value) - 4;
+                _buttons[ix].GetComponent<KMSelectable>().OnInteract();
+                command = command.Substring(m.Index + m.Length);
+                yield return new WaitForSeconds(0.1f);
+            }
+        }
+    }
+
+    private IEnumerator TwitchHandleForcedSolve()
+    {
+        if(_selections.Count >= 4)
+        {
+            for(int i = _selections.Count / 4 - 1; i > 0; --i)
+            {
+                int[] ps = _selections.Skip(4 * i).Take(4).Select(ix => _buttons[ix].Part).ToArray();
+                if(!ps.All(a => a == ps[0] && a != 0))
+                {
+                    _buttons[_selections[4 * i]].GetComponent<KMSelectable>().OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+            }
+        }
+
+        int q = 1;
+
+        if(_selections.Count % 4 != 0)
+        {
+            for(int i = _selections.Count - 1; (i + 4) % 4 != 3; --i)
+            {
+                int[] ps = _selections.TakeLast(_selections.Count % 4).ToArray();
+                if(!ps.All(a => a == ps[0] && a != 0))
+                {
+                    _buttons[_selections[i]].GetComponent<KMSelectable>().OnInteract();
+                    yield return new WaitForSeconds(0.1f);
+                }
+                else
+                    q = _buttons[_selections[i]].Part;
+            }
+        }
+
+        List<QEDCard> bs = _buttons.Where((c, i) => !_selections.Contains(i) || c.Part == 0).ToList();
+        while(!_isSolved)
+        {
+            foreach(QEDCard c in bs.Where(cd => cd.Part == q))
+            {
+                c.GetComponent<KMSelectable>().OnInteract();
+                yield return new WaitForSeconds(0.1f);
+            }
+            bs.RemoveAll(c => c.Part == q);
+            if(bs.Count != 0)
+                q = bs.First().Part;
+            if(bs.Count == 0)
+                break;
+        }
+
+        yield break;
     }
 }

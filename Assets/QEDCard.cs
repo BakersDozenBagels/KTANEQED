@@ -7,16 +7,17 @@ using UnityEngine;
 [RequireComponent(typeof(KMSelectable))]
 public class QEDCard : MonoBehaviour
 {
-    [SerializeField, RummageNoRemove, RummageNoRename]
+    [SerializeField]
     private GameObject[] _shapes;
-    [SerializeField, RummageNoRemove, RummageNoRename]
+    [SerializeField]
     private GameObject _symbol;
-    [SerializeField, RummageNoRemove, RummageNoRename]
+    [SerializeField]
     private Texture[] _symbols;
 
     public event Action Press = () => { };
 
-    [RummageNoRemove, RummageNoRename]
+    public int Part { get; set; }
+    
     private void Start()
     {
         GetComponent<KMSelectable>().OnHighlight += () => { Highlight(true); };
