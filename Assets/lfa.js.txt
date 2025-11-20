@@ -1,0 +1,111 @@
+[
+  {
+    regex:
+      /^Button (1[0-5]|[0-9]): (Triangle|Square|Pentagon|Hexagon), (Black|White) on (Black|White), (Empty|Dotted|Lined|Solid) (Triangle|Square|Pentagon|Hexagon)$/,
+    handler: function (/** @type{RegExpExecArray} */ matches, module) {
+      if (!module.buttons) {
+        module.buttons = [];
+        module.uniquifier = Math.floor(Math.random() * 2147483647);
+      }
+      const paths = {
+        Triangle: "M0.9330127,0.75 0.0669873,0.75 0.5,0z",
+        Square: "M0.5,0 0,0.5 0.5,1 1,0.5z",
+        Pentagon:
+          "M0.97552826,0.3454915 0.79389263,0.9045085 0.20610737,0.9045085 0.02447174,0.3454915 0.5,0z",
+        Hexagon:
+          "M0.9330127,0.25 0.9330127,0.75 0.5,1 0.0669873,0.75 0.0669873,0.25 0.5,0z",
+      };
+      const fills = {
+        Empty: "none",
+        Dotted: `url(#dotted-${module.uniquifier})`,
+        Lined: `url(#lined-${module.uniquifier})`,
+        Solid: "#000",
+      };
+      module.buttons.push(
+        `<g id="button-${matches[1]}-${
+          module.uniquifier
+        }" transform="translate(${matches[1] % 4} ${(matches[1] / 4) | 0})">
+          <path d="${
+            paths[matches[2]]
+          }" fill="var(--qed-color)" transform="translate(1 1) rotate(180)" />
+          <path d="${paths[matches[6]]}" fill="${
+          fills[matches[5]]
+        }" stroke="#000" stroke-width=".2" transform="translate(0.3, 0.3) scale(0.4)" />
+          <circle cx=0.8 cy=0.2 r=0.2 fill="${
+            matches[4] === "Black" ? "#000" : "#fff"
+          }" stroke="var(--qed-color)" stroke-width=0.04 />
+          <circle cx=0.8 cy=0.2 r=0.1 fill="${
+            matches[3] === "Black" ? "#000" : "#fff"
+          }"/>
+        </g>`
+      );
+      return true;
+    },
+  },
+  {
+    regex:
+      /^A possible solution would be: \((\d{1,2}, \d{1,2}, \d{1,2}, \d{1,2})\), \((\d{1,2}, \d{1,2}, \d{1,2}, \d{1,2})\), \((\d{1,2}, \d{1,2}, \d{1,2}, \d{1,2})\)$/,
+    handler: function (/** @type{RegExpExecArray} */ matches, module) {
+      module.push(
+        $(`
+      <svg viewbox="-0.1 -0.1 4.2 4.2" style="height: 20lh">
+        <defs>
+          <radialGradient id="dotted-${
+            module.uniquifier
+          }" gradientUnits="userSpaceOnUse" r="0.5" cy="0.5" cx="0.5">
+            <stop offset="0" style="stop-color: #000; stop-opacity: 1" />
+            <stop offset="0.3" style="stop-color: #000; stop-opacity: 1" />
+            <stop offset="0.30000001" style="stop-color: #000; stop-opacity: 0" />
+            <stop offset="1" style="stop-color: #000; stop-opacity: 0" />
+          </radialGradient>
+          <linearGradient id="lined-${
+            module.uniquifier
+          }" gradientUnits="userSpaceOnUse" spreadMethod="repeat" x1="0" x2="0.2">
+            <stop offset="0" style="stop-color: #000; stop-opacity: 1" />
+            <stop offset="0.5" style="stop-color: #000; stop-opacity: 1" />
+            <stop offset="0.50000001" style="stop-color: #000; stop-opacity: 0" />
+            <stop offset="1" style="stop-color: #000; stop-opacity: 0" />
+          </linearGradient>
+        </defs>
+        <style>
+          g {
+            --qed-color: #6141B4;
+          }
+          ${matches[1]
+            .split(", ")
+            .map((s) => `#button-${s}-${module.uniquifier}`)
+            .join(", ")} {
+            --qed-color: #f00;
+          }
+          ${matches[2]
+            .split(", ")
+            .map((s) => `#button-${s}-${module.uniquifier}`)
+            .join(", ")} {
+            --qed-color: #0f0;
+          }
+          ${matches[3]
+            .split(", ")
+            .map((s) => `#button-${s}-${module.uniquifier}`)
+            .join(", ")} {
+            --qed-color: #00f;
+          }
+        </style>
+        ${module.buttons.join("")}
+      </svg>
+      `)
+      );
+      module.push("One possible solution is shown above.");
+      return true;
+    },
+  },
+  {
+    regex: /^Pressed button (\d{1,2})$/,
+    handler: function (matches, module) {
+      module.push(`Pressed button ${+matches[1] + 1}`);
+      return true;
+    },
+  },
+  {
+    regex: /.+/,
+  },
+];

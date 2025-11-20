@@ -11,7 +11,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cf2299c8864afe4ab42466f546ae20d, type: 3}
   m_Name: WorkshopItem
   m_EditorClassIdentifier: 
-  WorkshopPublishedFileID: 2897159727
+  WorkshopPublishedFileID: 3018742859
   Title: Q.E.D.
   Tags:
   - Regular Module

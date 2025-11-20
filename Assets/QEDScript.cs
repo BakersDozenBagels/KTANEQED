@@ -26,7 +26,7 @@ public class QEDScript : MonoBehaviour
     private int[] _hls;
     private QEDCard.Symbol[] _symbols;
 
-    private static readonly string[] _hlNames = new string[] { "White on White", "White on Black", "Black on White", "Black on Black" };
+    private static readonly string[] _hlNames = new string[] { "Black on Black", "Black on White", "White on Black", "White on White" };
     private static readonly Color _buttonColor = new Color32(97, 65, 180, 255);
     private struct CardData
     {
@@ -235,6 +235,7 @@ public class QEDScript : MonoBehaviour
                         {
                             Log("Those Q.E.D.s do not form a S.E.T. Strike!");
                             GetComponent<KMBombModule>().HandleStrike();
+                            _qedRules.RemoveAt(2);
                         }
                         else
                         {
@@ -282,11 +283,11 @@ public class QEDScript : MonoBehaviour
         {
             if(!good[0])
                 Log("Bad S.E.T. of button shapes.");
-            if(!good[0])
+            if(!good[1])
                 Log("Bad S.E.T. of highlight rules.");
-            if(!good[0])
+            if(!good[2])
                 Log("Bad S.E.T. of shape fills.");
-            if(!good[0])
+            if(!good[3])
                 Log("Bad S.E.T. of shapes.");
             return false;
         }

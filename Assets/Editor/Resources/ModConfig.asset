@@ -14,10 +14,8 @@ MonoBehaviour:
   id: qed
   title: QED
   author: BakersDozenBagels
-  description: 'Suitable as a manual challenge if you would like to try it as one.
-
-
-    ID: QED'
-  version: 1.3
+  description: "Suitable as a manual challenge if you would like to try it as one.\r\n\r\nFind
+    the manual at https://gdane.net/manual/QED\r\n\r\nID: QED\r\nSource: https://github.com/BakersDozenBagels/KTANEQED.git"
+  version: 1.4
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 723f3840ae060524ebfd2dd4eb364c96, type: 3}
